@@ -6,7 +6,7 @@
 /*   By: glevin <glevin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 12:12:42 by glevin            #+#    #+#             */
-/*   Updated: 2024/11/10 15:49:55 by glevin           ###   ########.fr       */
+/*   Updated: 2024/11/10 16:55:55 by glevin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,13 +62,25 @@ void	do_pipe(t_pipex *pipex, char **envp, char *argv)
 	}
 }
 
-void	init_pipex(t_pipex *pipex, int argc, char **argv)
+void	init_pipex(t_pipex *pipex, int argc, char **argv, char **envp)
 {
 	char	*paths;
 
 	pipex->infile = openfile(argv[1], 1);
 	pipex->outfile = openfile(argv[argc - 1], 2);
-	paths = getenv("PATH");
+	while (ft_strncmp("PATH", *envp, 4))
+		envp++;
+	paths = *envp + 5;
+	pipex->paths = ft_split(paths, ':');
+}
+
+void	set_paths(t_pipex *pipex, char **envp)
+{
+	char	*paths;
+
+	while (ft_strncmp("PATH", *envp, 4))
+		envp++;
+	paths = *envp + 5;
 	pipex->paths = ft_split(paths, ':');
 }
 
@@ -80,7 +92,7 @@ int	main(int argc, char **argv, char **envp)
 
 	if (argc < 5)
 		return (1);
-	init_pipex(&pipex, argc, argv);
+	init_pipex(&pipex, argc, argv, envp);
 	dup2(pipex.infile, 0);
 	i = 2;
 	while (i < argc - 2)
