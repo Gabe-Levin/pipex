@@ -6,94 +6,93 @@
 /*   By: glevin <glevin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 12:12:42 by glevin            #+#    #+#             */
-/*   Updated: 2024/10/24 17:44:33 by glevin           ###   ########.fr       */
+/*   Updated: 2024/11/10 12:30:01 by glevin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/main.h"
 
-typedef struct s_pipex
+void	execute(t_pipex *pipex, char *argv, char **envp)
 {
-	int		fd[2];
-	pid_t	pid1;
-	pid_t	pid2;
-	char	*cmd;
 	char	**cmd_args;
-	int		infile;
-	int		outfile;
+	char	*cmd;
 
-}			t_pipex;
+	cmd_args = ft_split(argv, ' ');
+	cmd = get_cmd_path(pipex->paths, cmd_args[0]);
+	if (execve(cmd, cmd_args, envp) == -1)
+	{
+		perror("execve failed");
+		free(cmd);
+		free_split(cmd_args);
+		exit(127);
+	}
+}
 
-// char	*get_cmd_path(t_pipex *pipex, char **envp, char **argv)
-// {
-// }
-
-void	create_pipe(t_pipex *pipex, char **envp, char **argv)
+void	set_paths(t_pipex *pipex)
 {
-	if (pipe(pipex->fd) < 0)
+	char	*paths;
+
+	paths = getenv("PATH");
+	pipex->paths = ft_split(paths, ':');
+}
+
+void	do_pipe(t_pipex *pipex, char **envp, char *argv)
+{
+	int		status;
+	pid_t	pid;
+	int		fd[2];
+
+	status = 0;
+	if (pipe(fd) < 0)
 		exit(1);
-	pipex->pid1 = fork();
-	if (pipex->pid1 == -1)
+	pid = fork();
+	if (pid == -1)
 	{
 		perror("fork failed");
 		exit(1);
 	}
-	if (pipex->pid1 == 0)
+	else if (pid == 0)
 	{
-		dup2(pipex->fd[1], STDOUT_FILENO);
-		close(pipex->fd[0]);
-		close(pipex->fd[1]);
-		dup2(pipex->infile, STDIN_FILENO);
-		close(pipex->infile);
-		pipex->cmd_args = ft_split(argv[2], ' ');
-		pipex->cmd = pipex->cmd_args[0];
-        
-		execve(pipex->cmd, pipex->cmd_args, envp);
+		close(fd[0]);
+		dup2(fd[1], STDOUT_FILENO);
+		execute(pipex, argv, envp);
 	}
-	pipex->pid2 = fork();
-	if (pipex->pid2 == -1)
+	else
 	{
-		perror("fork failed");
-		exit(1);
+		close(fd[1]);
+		dup2(fd[0], STDIN_FILENO);
+		waitpid(pid, &status, 0);
 	}
-	if (pipex->pid2 == 0)
-	{
-		dup2(pipex->fd[0], STDIN_FILENO);
-		close(pipex->fd[0]);
-		close(pipex->fd[1]);
-		dup2(pipex->outfile, STDOUT_FILENO);
-		close(pipex->outfile);
-		// pipex->cmd = "/usr/bin/wc";
-		pipex->cmd_args = ft_split(argv[3], ' ');
-		pipex->cmd = pipex->cmd_args[0];
-        
-		execve(pipex->cmd, pipex->cmd_args, envp);
-	}
-    close(pipex->fd[0]);
-    close(pipex->fd[1]);
-    waitpid(pipex->pid1, NULL, 0);
-    waitpid(pipex->pid2, NULL, 0);
+}
+
+void	init_pipex(t_pipex *pipex, int argc, char **argv)
+{
+	pipex->paths = NULL;
+	pipex->infile = openfile(argv[1], 1);
+	pipex->outfile = openfile(argv[argc - 1], 2);
+	set_paths(pipex);
 }
 
 int	main(int argc, char **argv, char **envp)
 {
-	t_pipex pipex;
-	if (argc != 5)
-		return (1);
-    pipex.infile = open(argv[1], O_RDONLY);
-    pipex.outfile = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	t_pipex	pipex;
+	int		i;
 
-    
-    create_pipe(&pipex, envp, argv);
-	// for (int i = 0; envp[i] != NULL; i++)
-	// {
-	// 	printf("%s\n", envp[i]);
-	// }
-	// pipex = NULL;
-	argv = NULL;
-	envp = NULL;
+	if (argc < 5)
+		return (1);
+	init_pipex(&pipex, argc, argv);
+	dup2(pipex.infile, 0);
+	i = 2;
+	while (i < argc - 2)
+		do_pipe(&pipex, envp, argv[i++]);
+	dup2(pipex.outfile, STDOUT_FILENO);
+	execute(&pipex, argv[argc-2], envp);
+	free_pipex_struct(&pipex);
 	return (0);
 }
 
 // ./pipex ./infile.txt "/bin/cat" "/usr/bin/wc -l" ./outfile.txt
+// ./pipex ./infile.txt "/bin/cat" "/usr/bin/wc -l" "/usr/bin/wc -l" ./outfile.txt
+//  valgrind --leak-check=full --show-leak-kinds=all ./pipex ./infile.txt "/bin/cat" "/usr/bin/wc -l" "/usr/bin/wc -l" ./outfile.txt
 
+// glevin@c3a7c2:~/0_projects/pipex$ < ./infile.txt cat | wc -l > ./outfile.txt
