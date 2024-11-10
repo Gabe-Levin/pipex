@@ -6,7 +6,7 @@
 /*   By: glevin <glevin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 12:17:39 by glevin            #+#    #+#             */
-/*   Updated: 2024/11/10 12:07:41 by glevin           ###   ########.fr       */
+/*   Updated: 2024/11/10 15:16:24 by glevin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ typedef struct s_pipex
 
 }			t_pipex;
 
-void		free_pipex_struct(t_pipex *pipex);
+void		exit_clean(t_pipex *pipex, int ecode);
 char		*get_cmd_path(char **paths, char *in_cmd);
 int			openfile(char *filename, int i);
 void		free_split(char **split);

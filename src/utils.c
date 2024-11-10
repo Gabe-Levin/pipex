@@ -6,13 +6,13 @@
 /*   By: glevin <glevin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 10:40:59 by glevin            #+#    #+#             */
-/*   Updated: 2024/11/10 12:16:43 by glevin           ###   ########.fr       */
+/*   Updated: 2024/11/10 15:20:02 by glevin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/main.h"
 
-void	free_pipex_struct(t_pipex *pipex)
+void	exit_clean(t_pipex *pipex, int ecode)
 {
 	int	i;
 
@@ -26,16 +26,17 @@ void	free_pipex_struct(t_pipex *pipex)
 			free(pipex->paths[i]);
 			i++;
 		}
-        free(pipex->paths);
+		free(pipex->paths);
 	}
+	exit(ecode);
 }
 
-void free_split(char **split)
+void	free_split(char **split)
 {
-	int i;
-	
+	int	i;
+
 	i = 0;
-	while(split[i])
+	while (split[i])
 		free(split[i++]);
 	free(split);
 }
@@ -63,7 +64,7 @@ char	*get_cmd_path(char **paths, char *in_cmd)
 
 int	openfile(char *filename, int i)
 {
-	int	fd;
+	int fd;
 
 	fd = 0;
 	if (i == 1)
