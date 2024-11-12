@@ -6,7 +6,7 @@
 /*   By: glevin <glevin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 10:40:59 by glevin            #+#    #+#             */
-/*   Updated: 2024/11/12 17:28:16 by glevin           ###   ########.fr       */
+/*   Updated: 2024/11/12 17:29:32 by glevin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,6 @@ char	*get_cmd_path(char **paths, char *in_cmd)
 	i = -1;
 	if (!paths || !in_cmd)
 	{
-		printf("Invalid arguments: paths or in_cmd is NULL\n");
-		fflush(stdout);
 		return (NULL);
 	}
 	if (access(in_cmd, X_OK | F_OK) == 0)
@@ -60,8 +58,6 @@ char	*get_cmd_path(char **paths, char *in_cmd)
 	{
 		tmp_path = ft_strjoin(paths[i], "/");
 		cmd_path = ft_strjoin(tmp_path, in_cmd);
-		printf("cmd_path: %s", cmd_path);
-		fflush(stdout);
 		free(tmp_path);
 		if (access(cmd_path, X_OK | F_OK) == 0)
 			return (cmd_path);
