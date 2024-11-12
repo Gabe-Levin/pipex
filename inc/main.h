@@ -6,12 +6,12 @@
 /*   By: glevin <glevin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 12:17:39 by glevin            #+#    #+#             */
-/*   Updated: 2024/11/10 15:16:24 by glevin           ###   ########.fr       */
+/*   Updated: 2024/11/12 16:49:59 by glevin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX
-# define PIPEX
+#ifndef MAIN_H
+# define MAIN_H
 
 /* write, close, pipe, access, read, dup, dup2, execve, fork */
 /* pid_t datatype it is defined in <sys/types.h> */
@@ -42,7 +42,10 @@ typedef struct s_pipex
 
 void		exit_clean(t_pipex *pipex, int ecode);
 char		*get_cmd_path(char **paths, char *in_cmd);
-int			openfile(char *filename, int i);
+int			open_file(char *filename, int i);
 void		free_split(char **split);
+void		read_here_doc(int *fd, char *limiter);
+void		here_doc(char *limiter, int argc);
+void		execute(t_pipex *pipex, char *argv, char **envp);
 
 #endif

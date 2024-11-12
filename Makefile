@@ -6,7 +6,7 @@
 #    By: glevin <glevin@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/10/24 12:11:59 by glevin            #+#    #+#              #
-#    Updated: 2024/11/08 10:47:10 by glevin           ###   ########.fr        #
+#    Updated: 2024/11/12 11:34:18 by glevin           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ MASTERLIB_DIR = ./masterLib
 NAME = pipex
 
 # Source Files
-SRCS = $(SRC_DIR)/main.c $(SRC_DIR)/utils.c 
+SRCS = $(SRC_DIR)/main.c $(SRC_DIR)/utils.c $(SRC_DIR)/here_doc.c 
 
 # Object Files
 OBJS = $(SRCS:.c=.o)

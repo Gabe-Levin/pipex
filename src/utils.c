@@ -6,7 +6,7 @@
 /*   By: glevin <glevin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 10:40:59 by glevin            #+#    #+#             */
-/*   Updated: 2024/11/10 15:20:02 by glevin           ###   ########.fr       */
+/*   Updated: 2024/11/12 17:28:16 by glevin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,20 @@ char	*get_cmd_path(char **paths, char *in_cmd)
 	char	*tmp_path;
 
 	i = -1;
+	if (!paths || !in_cmd)
+	{
+		printf("Invalid arguments: paths or in_cmd is NULL\n");
+		fflush(stdout);
+		return (NULL);
+	}
 	if (access(in_cmd, X_OK | F_OK) == 0)
 		return (in_cmd);
 	while (paths[++i])
 	{
 		tmp_path = ft_strjoin(paths[i], "/");
 		cmd_path = ft_strjoin(tmp_path, in_cmd);
+		printf("cmd_path: %s", cmd_path);
+		fflush(stdout);
 		free(tmp_path);
 		if (access(cmd_path, X_OK | F_OK) == 0)
 			return (cmd_path);
@@ -62,11 +70,13 @@ char	*get_cmd_path(char **paths, char *in_cmd)
 	return (NULL);
 }
 
-int	openfile(char *filename, int i)
+int	open_file(char *filename, int i)
 {
-	int fd;
+	int	fd;
 
 	fd = 0;
+	if (i == 0)
+		fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 0777);
 	if (i == 1)
 		fd = open(filename, O_RDONLY);
 	else if (i == 2)
@@ -77,4 +87,26 @@ int	openfile(char *filename, int i)
 		exit(1);
 	}
 	return (fd);
+}
+
+void	execute(t_pipex *pipex, char *argv, char **envp)
+{
+	char	**cmd_args;
+	char	*cmd;
+
+	cmd_args = ft_split(argv, ' ');
+	cmd = get_cmd_path(pipex->paths, cmd_args[0]);
+	if (!cmd)
+	{
+		perror("Command not found");
+		free_split(cmd_args);
+		exit_clean(pipex, 127);
+	}
+	if (execve(cmd, cmd_args, envp) == -1)
+	{
+		perror("execve failed");
+		free(cmd);
+		free_split(cmd_args);
+		exit_clean(pipex, 127);
+	}
 }

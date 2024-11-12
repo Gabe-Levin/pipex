@@ -6,7 +6,7 @@
 /*   By: glevin <glevin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/09 11:29:50 by glevin            #+#    #+#             */
-/*   Updated: 2024/09/12 15:42:50 by glevin           ###   ########.fr       */
+/*   Updated: 2024/11/12 16:46:21 by glevin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,18 +118,23 @@ This would allow us to store only the minimum required amount of
 space for handling multiple fds, as appose to immediately initalizing
 a large array of pointers.
 */
+void	handle_new_fd(char **stash)
+{
+	if (*stash == NULL)
+	{
+		*stash = (char *)malloc(1);
+		if (*stash == NULL)
+			return ;
+		(*stash)[0] = '\0';
+	}
+}
+
 char	*get_next_line(int fd)
 {
 	char		*next_line;
 	static char	*stash[1024];
 
-	if (stash[fd] == NULL)
-	{
-		stash[fd] = (char *)malloc(1);
-		if (stash[fd] == NULL)
-			return (NULL);
-		stash[fd][0] = '\0';
-	}
+	handle_new_fd(&stash[fd]);
 	if (fd < 0 || BUFFER_SIZE <= 0 || 1024 <= fd || read(fd, 0, 0) < 0)
 	{
 		free(stash[fd]);
@@ -138,7 +143,11 @@ char	*get_next_line(int fd)
 	}
 	next_line = read_file(fd, &stash[fd]);
 	if (ft_strlen(next_line) != 0)
+	{
+		free(stash[fd]);
+		stash[fd] = NULL;
 		return (next_line);
+	}
 	free(stash[fd]);
 	stash[fd] = NULL;
 	free(next_line);
