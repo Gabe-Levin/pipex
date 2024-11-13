@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   main_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: glevin <glevin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 12:12:42 by glevin            #+#    #+#             */
-/*   Updated: 2024/11/13 13:18:35 by glevin           ###   ########.fr       */
+/*   Updated: 2024/11/13 13:28:45 by glevin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/main.h"
+#include "../inc/main_bonus.h"
 
 void	do_pipe(t_pipex *pipex, char **envp, char *argv)
 {
@@ -65,13 +65,22 @@ int	main(int argc, char **argv, char **envp)
 	t_pipex	pipex;
 	int		i;
 
-	if (argc != 5)
+	if (argc < 5)
 		return (1);
 	init_pipex(&pipex, envp);
-	pipex.infile = open_file(&pipex, argv[1], 1);
-	pipex.outfile = open_file(&pipex, argv[argc - 1], 2);
-	dup2(pipex.infile, 0);
-	i = 2;
+	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
+	{
+		pipex.outfile = open_file(&pipex, argv[argc - 1], 0);
+		here_doc(&pipex, argv[2], argc);
+		i = 3;
+	}
+	else
+	{
+		pipex.infile = open_file(&pipex, argv[1], 1);
+		pipex.outfile = open_file(&pipex, argv[argc - 1], 2);
+		dup2(pipex.infile, 0);
+		i = 2;
+	}
 	while (i < argc - 2)
 		do_pipe(&pipex, envp, argv[i++]);
 	final_execute(pipex, argc, argv, envp);
