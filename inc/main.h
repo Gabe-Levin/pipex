@@ -6,7 +6,7 @@
 /*   By: glevin <glevin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 12:17:39 by glevin            #+#    #+#             */
-/*   Updated: 2024/11/12 16:49:59 by glevin           ###   ########.fr       */
+/*   Updated: 2024/11/13 12:25:12 by glevin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,9 @@ typedef struct s_pipex
 
 void		exit_clean(t_pipex *pipex, int ecode);
 char		*get_cmd_path(char **paths, char *in_cmd);
-int			open_file(char *filename, int i);
+int			open_file(t_pipex *pipex, char *filename, int i);
 void		free_split(char **split);
-void		read_here_doc(int *fd, char *limiter);
-void		here_doc(char *limiter, int argc);
+void		here_doc(t_pipex *pipex, char *limiter, int argc);
 void		execute(t_pipex *pipex, char *argv, char **envp);
 
 #endif

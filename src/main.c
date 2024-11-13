@@ -6,7 +6,7 @@
 /*   By: glevin <glevin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/24 12:12:42 by glevin            #+#    #+#             */
-/*   Updated: 2024/11/12 17:18:52 by glevin           ###   ########.fr       */
+/*   Updated: 2024/11/13 12:24:40 by glevin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,14 +70,14 @@ int	main(int argc, char **argv, char **envp)
 	init_pipex(&pipex, envp);
 	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
 	{
-		pipex.outfile = open_file(argv[argc - 1], 0);
-		here_doc(argv[2], argc);
+		pipex.outfile = open_file(&pipex, argv[argc - 1], 0);
+		here_doc(&pipex, argv[2], argc);
 		i = 3;
 	}
 	else
 	{
-		pipex.infile = open_file(argv[1], 1);
-		pipex.outfile = open_file(argv[argc - 1], 2);
+		pipex.infile = open_file(&pipex, argv[1], 1);
+		pipex.outfile = open_file(&pipex, argv[argc - 1], 2);
 		dup2(pipex.infile, 0);
 		i = 2;
 	}

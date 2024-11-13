@@ -6,7 +6,7 @@
 /*   By: glevin <glevin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/08 10:40:59 by glevin            #+#    #+#             */
-/*   Updated: 2024/11/12 17:29:32 by glevin           ###   ########.fr       */
+/*   Updated: 2024/11/13 12:32:14 by glevin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ char	*get_cmd_path(char **paths, char *in_cmd)
 	return (NULL);
 }
 
-int	open_file(char *filename, int i)
+int	open_file(t_pipex *pipex, char *filename, int i)
 {
 	int	fd;
 
@@ -80,7 +80,7 @@ int	open_file(char *filename, int i)
 	if (fd < 0)
 	{
 		perror("\033[31mError");
-		exit(1);
+		exit_clean(pipex, 1);
 	}
 	return (fd);
 }
@@ -91,7 +91,9 @@ void	execute(t_pipex *pipex, char *argv, char **envp)
 	char	*cmd;
 
 	cmd_args = ft_split(argv, ' ');
+	dprintf(STDERR_FILENO, "cmd_args: %s\n", cmd_args[0]);
 	cmd = get_cmd_path(pipex->paths, cmd_args[0]);
+	dprintf(STDERR_FILENO, "cmd_args: %s\n", cmd);
 	if (!cmd)
 	{
 		perror("Command not found");
