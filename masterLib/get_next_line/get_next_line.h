@@ -6,7 +6,7 @@
 /*   By: glevin <glevin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/14 20:46:16 by glevin            #+#    #+#             */
-/*   Updated: 2024/09/13 15:37:57 by glevin           ###   ########.fr       */
+/*   Updated: 2024/11/17 16:48:44 by glevin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 # endif
 
 char	*get_next_line(int fd);
-// size_t	ft_strlen(const char *str);
 char	*ft_strdup(const char *string);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
 char	*ft_strjoin(char const *s1, char const *s2);

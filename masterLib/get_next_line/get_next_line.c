@@ -6,14 +6,28 @@
 /*   By: glevin <glevin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/09 11:29:50 by glevin            #+#    #+#             */
-/*   Updated: 2024/11/12 16:46:21 by glevin           ###   ########.fr       */
+/*   Updated: 2024/11/17 17:03:18 by glevin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#ifndef MAX_FD
-# define MAX_FD 1024
-#endif
+
+/*
+This function determines the index of a new line character within str,
+if there is one. If not, it will return -1.
+*/
+int	ft_istrchr(const char *str, int c)
+{
+	int	i;
+
+	i = 0;
+	while (str[i] != (unsigned char)c)
+	{
+		if (!str[i++])
+			return (-1);
+	}
+	return (i);
+}
 
 /*
 This function adds the new buffer from the latest read to the end of the stash.
@@ -103,53 +117,34 @@ char	*read_file(int fd, char **stash)
 /*
 This one is initializing the static char *stash, in order to have access to
 this pointer across multiple function calls. We are checking if the file
-descriptior (FD) and BUFFER_SIZE are valid, or if the file is corrupted.
+descriptor (FD) and BUFFER_SIZE are valid, or if the file is corrupted.
 If all looks kosher, we start reading the file into buffer and begin
 looking for new lines.
-
-BONUS: This approach initializes stash as an array of char
-pointers of length 1024 (an arbitrarily high number for fd). This allows
-the function to handle multiple fd's at once. The pointer to the stash
-corresponding to a given fd, is stored in the 'fd' index of stash.
-Given an fd, the stash[fd] is passed to read_file.
-
-A more storage efficient approach, would be to use a linked list.
-This would allow us to store only the minimum required amount of
-space for handling multiple fds, as appose to immediately initalizing
-a large array of pointers.
 */
-void	handle_new_fd(char **stash)
-{
-	if (*stash == NULL)
-	{
-		*stash = (char *)malloc(1);
-		if (*stash == NULL)
-			return ;
-		(*stash)[0] = '\0';
-	}
-}
 
 char	*get_next_line(int fd)
 {
 	char		*next_line;
-	static char	*stash[1024];
+	static char	*stash;
 
-	handle_new_fd(&stash[fd]);
-	if (fd < 0 || BUFFER_SIZE <= 0 || 1024 <= fd || read(fd, 0, 0) < 0)
+	if (stash == NULL)
 	{
-		free(stash[fd]);
-		stash[fd] = NULL;
+		stash = (char *)malloc(1);
+		if (stash == NULL)
+			return (NULL);
+		stash[0] = '\0';
+	}
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+	{
+		free(stash);
+		stash = NULL;
 		return (NULL);
 	}
-	next_line = read_file(fd, &stash[fd]);
+	next_line = read_file(fd, &stash);
+	free(stash);
+	stash = NULL;
 	if (ft_strlen(next_line) != 0)
-	{
-		free(stash[fd]);
-		stash[fd] = NULL;
 		return (next_line);
-	}
-	free(stash[fd]);
-	stash[fd] = NULL;
 	free(next_line);
 	return (NULL);
 }
